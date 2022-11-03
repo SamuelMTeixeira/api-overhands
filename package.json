@@ -11,7 +11,7 @@
     "dev": "nodemon index.js",
     "create-db": "sequelize db:create",
     "migrate": "sequelize db:migrate",
-    "migrate-create": "yarn sequelize migration:create"
+    "add-migrate": "yarn sequelize migration:create"
   },
   "keywords": [],
   "author": "",

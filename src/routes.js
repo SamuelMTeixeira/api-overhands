@@ -1,7 +1,6 @@
 const express = require('express')
 
 // Controllers
-const UserController = require('./controller/UserController')
 const StudyTracksController = require('./controller/StudyTrackController')
 const AuthController = require('./controller/AuthController')
 

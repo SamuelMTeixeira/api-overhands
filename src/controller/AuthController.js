@@ -43,7 +43,7 @@ module.exports = {
     },
 
     async register(req, res) {
-        const { name, lastname, email, password } = req.body
+        const { name, lastname, email, password, situation } = req.body
 
         const isUserExists = await User.findOne({
             where: { email }
@@ -55,7 +55,7 @@ module.exports = {
 
         const hash = await bcrypt.hash(password, 10) // Criptografa a senha
 
-        const user = await User.create({ name, lastname, email, password: hash, isAdmin: 0, xp: 0 })
+        const user = await User.create({ name, lastname, email, password: hash, situation, isAdmin: 0, xp: 0 })
 
         const token = generateToken(user.id)
 

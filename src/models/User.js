@@ -10,6 +10,7 @@ class User extends Model {
             isAdmin: DataTypes.BOOLEAN,
             xp: DataTypes.INTEGER,
             idGoogle: DataTypes.STRING,
+            situation: DataTypes.STRING
         }, { 
             sequelize,
         })
