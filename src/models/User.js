@@ -10,17 +10,13 @@ class User extends Model {
             isAdmin: DataTypes.BOOLEAN,
             xp: DataTypes.INTEGER,
             idGoogle: DataTypes.STRING,
-            situation: DataTypes.STRING
+            situation: DataTypes.STRING,
+            birth: DataTypes.DATE,
+            gender: DataTypes.STRING
         }, { 
             sequelize,
         })
     }
-
-
-    static associate(models) {
-        this.hasMany(models.StudyTrack, { foreignKey: 'idProfile', as: 'StudyTracks' });
-    }
-
 }
 
 module.exports = User

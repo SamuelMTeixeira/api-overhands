@@ -11,10 +11,14 @@
     "dev": "nodemon index.js",
     "create-db": "sequelize db:create",
     "migrate": "sequelize db:migrate",
-    "add-migrate": "yarn sequelize migration:create"
+    "add-migrate": "sequelize migration:create"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "Libras",
+    "Educação",
+    "Língua de sinais"
+  ],
+  "author": "Samuel Molendolff Teixeira",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.0",

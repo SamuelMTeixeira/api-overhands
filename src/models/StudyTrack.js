@@ -4,16 +4,16 @@ class StudyTrack extends Model {
     static init(sequelize) {
         super.init({
             name: DataTypes.STRING,
-            description: DataTypes.STRING,
-            idProfile: DataTypes.INTEGER
+            description: DataTypes.STRING
         }, {
             sequelize,
         })
     }
 
     static associate(models) {
-        this.belongsTo(models.User, { foreignKey: 'idProfile', as: 'Users' });
+        this.hasMany(models.StudyTrack, { foreignKey: 'StudyTracks_id', as: 'Categories' });
     }
+
 }
 
 module.exports = StudyTrack

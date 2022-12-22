@@ -13,3 +13,4 @@ app.use(routes) // Add as rotas criadas
 
 const port = process.env.PORT
 app.listen(port) // Abre o servidor na porta informada
+console.log(`O servidor foi iniciado com sucesso!`)

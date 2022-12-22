@@ -36,14 +36,16 @@ module.exports = {
                 email: user.email,
                 idGoogle: user.idGoogle,
                 xp: user.xp,
-                isAdmin: user.isAdmin,
+                situation: user.situation,
+                birth: user.birth,
+                gender: user.gender,
             }
         })
 
     },
 
     async register(req, res) {
-        const { name, lastname, email, password, situation } = req.body
+        const { name, lastname, email, password, situation, gender, birth } = req.body
 
         const isUserExists = await User.findOne({
             where: { email }
