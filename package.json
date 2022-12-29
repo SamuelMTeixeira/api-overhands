@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "nodemon index.js ",
     "create-db": "sequelize db:create",
     "migrate": "sequelize db:migrate",
     "add-migrate": "sequelize migration:create"

@@ -57,7 +57,7 @@ module.exports = {
 
         const hash = await bcrypt.hash(password, 10) // Criptografa a senha
 
-        const user = await User.create({ name, lastname, email, password: hash, situation, isAdmin: 0, xp: 0 })
+        const user = await User.create({ name, lastname, email, password: hash, gender, birth, situation, isAdmin: 0, xp: 0 })
 
         const token = generateToken(user.id)
 
@@ -67,6 +67,8 @@ module.exports = {
                 name: user.name,
                 lastname: user.lastname,
                 email: user.email,
+                gender: user.gender,
+                birth: user.birth,
                 idGoogle: user.idGoogle,
                 xp: user.xp,
                 isAdmin: user.isAdmin,
