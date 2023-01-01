@@ -13,7 +13,9 @@ class Category extends Model {
     }
 
     static associate(models) {
-        this.belongsTo(models.StudyTrack, { foreignKey: 'StudyTracks_id', as: 'StudyTracks' });
+        this.belongsTo(models.StudyTrack, { foreignKey: 'StudyTracks_id', as: 'studyTrack' })
+        
+        this.hasMany(models.Activity, { foreignKey: 'Category_id', as: 'activities' })
     }
 }
 

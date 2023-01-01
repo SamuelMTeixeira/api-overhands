@@ -11,7 +11,7 @@ class StudyTrack extends Model {
     }
 
     static associate(models) {
-        this.hasMany(models.StudyTrack, { foreignKey: 'StudyTracks_id', as: 'Categories' });
+        this.hasMany(models.Category, { foreignKey: 'StudyTracks_id', as: 'categories' })
     }
 
 }

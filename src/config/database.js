@@ -12,7 +12,4 @@ module.exports = {
         underscored: false,  // Se tiver true significa que vai separar o espaço do nome da tabela por _
     },
     timezone: '-03:00',
-    dialectOptions: {
-        useUTC: false
-    }
 }
