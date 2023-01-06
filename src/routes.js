@@ -23,6 +23,6 @@ routes.post('/register', AuthController.register)
 
 // Category tracks routes
 routes.get('/categories', authMiddleware, CategoryController.index)
-routes.post('/register', authMiddleware, CategoryController.index)
+routes.post('/categories', adminMiddleware, CategoryController.index)
 
 module.exports = routes
