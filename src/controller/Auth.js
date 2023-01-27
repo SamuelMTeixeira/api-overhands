@@ -31,10 +31,10 @@ module.exports = {
         return await res.json({
             token,
             user: {
+                id: user.id,
                 name: user.name,
                 lastname: user.lastname,
                 email: user.email,
-                idGoogle: user.idGoogle,
                 xp: user.xp,
                 situation: user.situation,
                 birth: user.birth,
@@ -64,12 +64,12 @@ module.exports = {
         return await res.json({
             token,
             user: {
+                id: user.id,
                 name: user.name,
                 lastname: user.lastname,
                 email: user.email,
                 gender: user.gender,
                 birth: user.birth,
-                idGoogle: user.idGoogle,
                 xp: user.xp,
                 isAdmin: user.isAdmin,
             }

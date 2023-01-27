@@ -11,6 +11,7 @@ module.exports = {
     async index(req, res) {
 
         const { idUser } = req.body
+        console.log("alguem fez uma requisição aqui", idUser)
 
         // Validations
 
@@ -20,7 +21,7 @@ module.exports = {
         const user = await User.findByPk(idUser)
 
         if (!user)
-            return await res.status(400).json({ error: 'Id invalid' })
+            return await res.status(401).json({ error: 'Id invalid' })
 
 
         // Query 
@@ -38,9 +39,8 @@ module.exports = {
             GROUP BY StudyTracks.id
         `
 
-        const tracks = await sequelize.query(query)
-
-
+        const tracks = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
+        
         return await res.json(tracks)
     },
 
