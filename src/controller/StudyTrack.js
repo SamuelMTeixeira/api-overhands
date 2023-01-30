@@ -11,7 +11,6 @@ module.exports = {
     async index(req, res) {
 
         const { idUser } = req.body
-        console.log("alguem fez uma requisição aqui", idUser)
 
         // Validations
 
@@ -50,9 +49,8 @@ module.exports = {
 
         const studyTrack = await StudyTrack.create({ name, description })
 
-        return await res.json({
-            name: studyTrack.name,
-            description: studyTrack.description
+        return await res.json({ 
+            status: `Track '${studyTrack.name}' was successfully created`
         })
 
     }

@@ -6,12 +6,11 @@ module.exports = {
         const { idStudyTrack } = req.body
 
         // Validations
-
         if (!idStudyTrack)
             return await res.status(400).json({ error: 'Id is missing' })
 
         const allCategories = await Category.findAll({
-            attributes: ['name', 'image', 'difficulty', 'difficultyOrder'],
+            attributes: ['name', 'difficulty', 'difficultyOrder'],
             where: { "StudyTracks_id": idStudyTrack },
             order: ['difficultyOrder']
         });
@@ -20,15 +19,15 @@ module.exports = {
     },
 
     async store(req, res) {
-        const { name, image, difficulty, difficultyOrder, idStudyTrack } = req.body
+        const { name, difficulty, difficultyOrder, idStudyTrack } = req.body
 
-        const category = await Category.create({ name, image, difficulty, difficultyOrder, StudyTracks_id: idStudyTrack })
+        if (!name || !difficulty || !idStudyTrack)
+            return res.status(400).json({ error: 'Important information is missing' })
+
+        const category = await Category.create({ name, difficulty, difficultyOrder, StudyTracks_id: idStudyTrack })
 
         return await res.json({
-            name: category.name,
-            image: category.image,
-            difficulty: category.difficulty,
-            difficultyOrder: category.difficultyOrder
+            status: `Category '${category.name}' was successfully created`
         })
 
     }
