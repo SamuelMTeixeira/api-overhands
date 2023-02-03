@@ -26,6 +26,21 @@ services:
     environment:
       - PMA_ARBITRARY=1
 
+  minio: 
+          image: minio/minio
+          container_name: overhands-minio
+          environment:
+              MINIO_ROOT_USER: samuel
+              MINIO_ROOT_PASSWORD: samuel123
+          volumes:
+              - minio_data:/data
+          ports:
+              - 9000:9000
+              - 9001:9001
+          command: server --console-address ":9001" /data
 
 networks:
   ntwk:
+
+volumes:
+    minio_data:

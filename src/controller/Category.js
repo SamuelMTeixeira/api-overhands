@@ -7,7 +7,7 @@ module.exports = {
 
         // Validations
         if (!idStudyTrack)
-            return await res.status(400).json({ error: 'Id is missing' })
+            return await res.status(400).json({ error: 'Study track ID is missing' })
 
         const allCategories = await Category.findAll({
             attributes: ['name', 'difficulty', 'difficultyOrder'],
@@ -22,7 +22,7 @@ module.exports = {
         const { name, difficulty, difficultyOrder, idStudyTrack } = req.body
 
         if (!name || !difficulty || !idStudyTrack)
-            return res.status(400).json({ error: 'Important information is missing' })
+            return res.status(400).json({ error: 'Some important params is missing' })
 
         const category = await Category.create({ name, difficulty, difficultyOrder, StudyTracks_id: idStudyTrack })
 
