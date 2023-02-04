@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js ",
-    "docker-run": "cd docker && docker-compose up -d && cd ..",
+    "docker-run": "cd docker && docker-compose --env-file=../.env  up -d && cd ..",
     "migrate": "sequelize db:migrate",
     "add-migrate": "sequelize migration:create"
   },
