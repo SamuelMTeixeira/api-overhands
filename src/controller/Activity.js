@@ -1,7 +1,7 @@
 // Models
 const Activities = require('../models/Activity')
 
-const sequelize = require('../database')
+const getPresignedUrl = require('../minio/getPresignedUrl')
 
 module.exports = {
     async index(req, res) {
@@ -10,14 +10,36 @@ module.exports = {
 
         // Validations
         if (!idCategory)
-            return await res.status(400).json({ error: 'Activity ID is missing' })
+            return await res.status(400).json({ error: 'Missing activity ID' })
 
         // Query
-        const allActitivies = await Activities.findAll({
+        const activities = await Activities.findAll({
+            attributes: ['id', 'name', 'imageDescription', 'xp', 'type', 'correctImage'],
             where: { "Category_id": idCategory }
         })
 
-        return await res.json(allActitivies)
+        // * Take a image name and get a url in the bucket
+        const promises = activities.map(async activity => {
+            if (activity.imageDescription) {
+                try {
+                    const presignedUrl = await getPresignedUrl('tcc', activity.imageDescription, 1000)
+                    activity.imageDescription = presignedUrl
+                } catch (error) {
+                    console.error(error);
+                }
+            } else if (activity.correctImage) {
+                try {
+                    const presignedUrl = await getPresignedUrl('tcc', activity.correctImage, 1000)
+                    activity.correctImage = presignedUrl
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
+
+        await Promise.all(promises)
+
+        return res.json(activities)
     },
 
     async store(req, res) {
@@ -35,26 +57,31 @@ module.exports = {
             return res.status(400).json({ error: 'Type invalid' })
 
 
-        // Insert in database
-
+        // Create the quiz
         switch (type) {
-            // * Quiz type: guess the image
             case 1:
-                if (!correctAnswer)
-                    return await res.status(400).json({ error: 'A correct answer is missing' })
-
-                const newActivityImage = await Activities.create({ name, type, xp, correctAnswer, imageDescription: objectName, Category_id: idCategory })
-
-                return await res.json({ status: `Activity '${newActivityImage.name}' was successfully created` })
-
-
-            // * Quiz type: guess the text
+                return await createQuizTypeImage({ name, type, xp, correctAnswer, imageDescription: objectName, Category_id: idCategory }, res)
             case 2:
-                const newActivityText = await Activities.create({ name, type, xp, correctImage: objectName, Category_id: idCategory })
-
-                return await res.json({ status: `Activity '${newActivityText.name}' was successfully created` })
+                return await createQuizTypeText({ name, type, xp, correctImage: objectName, Category_id: idCategory }, res)
         }
-
     }
 
+}
+
+
+const createQuizTypeImage = async (data, res) => {
+
+    if (!data.correctAnswer)
+        return await res.status(400).json({ error: 'A correct answer is missing' })
+
+    const newActivityText = await Activities.create(data);
+
+    return await res.json({ status: `Activity '${newActivityText.name}' was successfully created` });
+}
+
+const createQuizTypeText = async (data, res) => {
+
+    const newActivityText = await Activities.create(data)
+
+    return await res.json({ status: `Activity '${newActivityText.name}' was successfully created` })
 }
