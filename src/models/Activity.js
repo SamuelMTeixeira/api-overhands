@@ -4,10 +4,11 @@ class Activity extends Model {
     static init(sequelize) {
         super.init({
             name: DataTypes.STRING,
-            imageDescription: DataTypes.BLOB,
+            imageDescription: DataTypes.STRING,
             xp: DataTypes.INTEGER,
             type: DataTypes.INTEGER,
-            correctImage: DataTypes.BLOB,
+            tip: DataTypes.STRING,
+            correctImage: DataTypes.STRING,
             correctAnswer: DataTypes.STRING,
         }, {
             sequelize,

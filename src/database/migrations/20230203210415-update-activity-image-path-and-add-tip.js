@@ -17,6 +17,11 @@ module.exports = {
         allowNull: true,
       }, { transaction })
 
+      await queryInterface.addColumn('Activities', 'tip', {
+        type: Sequelize.STRING,
+        allowNull: false,
+      }, { transaction })
+
 
       await transaction.commit();
     } catch (err) {
@@ -39,6 +44,8 @@ module.exports = {
         type: Sequelize.BLOB,
         allowNull: true,
       }, { transaction })
+
+      await queryInterface.removeColumn('Activities', 'tip', { transaction })
 
       await transaction.commit();
     } catch (err) {

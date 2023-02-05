@@ -1,6 +1,7 @@
 // Models
 const Activities = require('../models/Activity')
 
+// MinIO
 const getPresignedUrl = require('../minio/getPresignedUrl')
 
 module.exports = {
@@ -18,18 +19,18 @@ module.exports = {
             where: { "Category_id": idCategory }
         })
 
-        // * Take a image name and get a url in the bucket
+        // * Take an image name and request an url for this image
         const promises = activities.map(async activity => {
             if (activity.imageDescription) {
                 try {
-                    const presignedUrl = await getPresignedUrl('tcc', activity.imageDescription, 1000)
+                    const presignedUrl = await getPresignedUrl('tcc', activity.imageDescription, 604800) // 604800 = Expires in 7 days
                     activity.imageDescription = presignedUrl
                 } catch (error) {
                     console.error(error);
                 }
             } else if (activity.correctImage) {
                 try {
-                    const presignedUrl = await getPresignedUrl('tcc', activity.correctImage, 1000)
+                    const presignedUrl = await getPresignedUrl('tcc', activity.correctImage, 604800)
                     activity.correctImage = presignedUrl
                 } catch (error) {
                     console.error(error);
@@ -44,7 +45,7 @@ module.exports = {
 
     async store(req, res) {
 
-        const { name, type, xp, idCategory, correctAnswer } = JSON.parse(req.body.informations)
+        const { name, type, xp, idCategory, correctAnswer, tip } = JSON.parse(req.body.informations)
 
         // Take the image name uploaded
         const { objectName } = req.file
@@ -60,9 +61,9 @@ module.exports = {
         // Create the quiz
         switch (type) {
             case 1:
-                return await createQuizTypeImage({ name, type, xp, correctAnswer, imageDescription: objectName, Category_id: idCategory }, res)
+                return await createQuizTypeImage({ name, type, xp, correctAnswer, imageDescription: objectName, Category_id: idCategory, tip }, res)
             case 2:
-                return await createQuizTypeText({ name, type, xp, correctImage: objectName, Category_id: idCategory }, res)
+                return await createQuizTypeText({ name, type, xp, correctImage: objectName, Category_id: idCategory, tip }, res)
         }
     }
 
