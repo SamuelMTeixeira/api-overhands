@@ -30,6 +30,7 @@ services:
     image: minio/minio
     container_name: overhands-minio
     environment:
+      MINIO_ROOT_USER: ${MINIO_USERNAME}
       MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     volumes:
       - minio_data:/data
@@ -37,8 +38,6 @@ services:
       - 80:9000
       - 9001:9001
     command: server --console-address ":9001" /data
-    env_file:
-      - ../.env
 
 networks:
   ntwk:

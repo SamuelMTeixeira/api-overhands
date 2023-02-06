@@ -8,8 +8,6 @@ class User extends Model {
             email: DataTypes.STRING,
             password: DataTypes.STRING,
             isAdmin: DataTypes.BOOLEAN,
-            xp: DataTypes.INTEGER,
-            idGoogle: DataTypes.STRING,
             situation: DataTypes.STRING,
             birth: DataTypes.DATE,
             gender: DataTypes.STRING
