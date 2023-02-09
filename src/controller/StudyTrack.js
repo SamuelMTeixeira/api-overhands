@@ -10,7 +10,7 @@ const sequelize = require('../database')
 module.exports = {
     async index(req, res) {
 
-        const { idUser } = req.body
+        const { idUser } = req.query
 
         // Validations
 

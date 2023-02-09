@@ -7,7 +7,7 @@ const getPresignedUrl = require('../minio/getPresignedUrl')
 module.exports = {
     async index(req, res) {
 
-        const { idCategory } = req.body
+        const { idCategory } = req.query
 
         // Validations
         if (!idCategory)

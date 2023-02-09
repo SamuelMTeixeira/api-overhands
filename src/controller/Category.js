@@ -3,7 +3,7 @@ const Category = require('../models/Category')
 module.exports = {
     async index(req, res) {
 
-        const { idStudyTrack } = req.body
+        const { idStudyTrack } = req.query
 
         // Validations
         if (!idStudyTrack)
