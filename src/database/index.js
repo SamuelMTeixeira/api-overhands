@@ -18,20 +18,20 @@ const dbLogin = async () => {
     }
 }
 
-dbLogin().then(() => {
-    // Conexões dos models
-    User.init(connection)
-    StudyTrack.init(connection)
-    Category.init(connection)
-    Activity.init(connection)
-    Stat.init(connection)
+dbLogin()
 
-    // Associação das chaves estrangeiras
-    User.associate(connection.models)
-    Category.associate(connection.models)
-    StudyTrack.associate(connection.models)
-    Activity.associate(connection.models)
-    Stat.associate(connection.models)
-})
+// Conexões dos models
+User.init(connection)
+StudyTrack.init(connection)
+Category.init(connection)
+Activity.init(connection)
+Stat.init(connection)
+
+// Associação das chaves estrangeiras
+User.associate(connection.models)
+Category.associate(connection.models)
+StudyTrack.associate(connection.models)
+Activity.associate(connection.models)
+Stat.associate(connection.models)
 
 module.exports = connection

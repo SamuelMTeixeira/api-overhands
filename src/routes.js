@@ -1,4 +1,4 @@
-const express = require('express')
+const app = require('express')
 
 // Controllers
 const StudyTracksController = require('./controller/StudyTrack')
@@ -11,7 +11,7 @@ const authMiddleware = require('./middleware/auth')
 const adminMiddleware = require('./middleware/admin')
 const multer = require('./middleware/multer')
 
-const routes = express.Router()
+const routes = app.Router()
 
 routes.get('/', (req, res) => res.json('Beba seu café sem preucupações! por aqui está tudo em dia.'))
 
