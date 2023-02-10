@@ -1,49 +1,42 @@
-const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const authConfig = require('../config/auth')
 
 // Models
+const User = require('../models/User')
 const sequelize = require('../database')
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, authConfig.secret, {
-        expiresIn: "15d"
-    })
-}
+const generateToken = (id) => jwt.sign({ id }, authConfig.secret, {
+    expiresIn: "15d"
+})
 
 module.exports = {
     async login(req, res) {
         const { email, password } = req.body
 
-
         const user = await User.findOne({
-            attributes: ['id', 'name', 'lastname', 'email', 'password', 'situation', 'birth', 'gender',],
             where: { email }
         })
 
         if (!user) {
-            return await res.status(400).json({ error: 'Invalid email' })
+            return res.status(400).json({ error: 'Invalid email' })
         }
 
-        if (!await bcrypt.compare(password, user.password)) {
-            return await res.status(400).json({ error: 'Invalid password' })
+        if (!(await bcrypt.compare(password, user.password))) {
+            return res.status(400).json({ error: "Invalid password" });
         }
 
         const token = generateToken(user.id)
-
 
         const queryXP = `
             SELECT CASE WHEN SUM(a.xp) IS NULL THEN 0 ELSE FLOOR(SUM(a.xp)) END AS xp
             FROM Users u
             INNER JOIN Stats s ON s.Users_id = u.id
             INNER JOIN Activities a ON a.id = s.Activity_id
-            WHERE u.id = ${user.id} AND s.isCorrect = true
+            WHERE u.id = ${user.id} AND s.isCorrect = true`
 
-        `
         // Get XP user
         const getXp = await sequelize.query(queryXP, { type: sequelize.QueryTypes.SELECT })
-        const xp = getXp[0].xp
 
         return await res.json({
             token,
@@ -55,7 +48,7 @@ module.exports = {
                 situation: user.situation,
                 birth: user.birth,
                 gender: user.gender,
-                xp
+                xp: getXp[0].xp
             }
         })
 
@@ -65,7 +58,6 @@ module.exports = {
         const { name, lastname, email, password, situation, gender, birth } = req.body
 
         const isUserExists = await User.findOne({
-            attributes: ['id', 'name', 'lastname', 'email', 'password', 'situation', 'birth', 'gender',],
             where: { email }
         })
 
@@ -89,7 +81,6 @@ module.exports = {
         `
         // Get XP user
         const getXp = await sequelize.query(queryXP, { type: sequelize.QueryTypes.SELECT })
-        const xp = getXp[0].xp
 
         return await res.json({
             token,
@@ -100,7 +91,7 @@ module.exports = {
                 email: user.email,
                 gender: user.gender,
                 birth: user.birth,
-                xp,
+                xp: getXp[0].xp,
             }
         })
     },

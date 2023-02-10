@@ -1,9 +1,6 @@
 // Models
 const StudyTrack = require('../models/StudyTrack')
 const User = require('../models/User')
-const Stat = require('../models/Stat')
-const Categories = require('../models/Category')
-const Activities = require('../models/Activity')
 
 const sequelize = require('../database')
 
