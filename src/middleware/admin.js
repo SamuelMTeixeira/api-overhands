@@ -3,32 +3,38 @@ const authConfig = require('../config/auth')
 const User = require('../models/User')
 
 module.exports = async (req, res, next) => {
-    const authHeader = req.headers.authorization
+    try {
+        const authHeader = req.headers.authorization;
 
-    if (!authHeader)
-        return res.status(401).json({ error: 'Token is missing' })
+        if (!authHeader) {
+            return res.status(401).json({ error: 'Token is missing' });
+        }
 
-    const parts = authHeader.split(' ')
+        const parts = authHeader.split(' ');
 
-    if (!parts === 2)
-        return res.status(401).json({ error: 'Token error' })
+        if (parts.length !== 2) {
+            return res.status(401).json({ error: 'Token error' });
+        }
 
-    const [scheme, token] = parts
+        const [scheme, token] = parts;
 
+        const decoded = jwt.verify(token, authConfig.secret);
 
-    const id = jwt.verify(token, authConfig.secret, (err, decoded) => {
-        if (err) return res.status(401).json({ error: 'Invalid token' })
+        const userId = decoded.id;
 
-        req.userId = decoded.id
+        const user = await User.findByPk(userId);
 
-        return req.userId
-    })
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
 
-    const user = await User.findByPk(id)
+        if (!user.isAdmin) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
 
-    if (!user.isAdmin)
-        return res.status(403).json({ error: 'Access denied' })
-
-    return next()
+        return next();
+    } catch (error) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
 
 }

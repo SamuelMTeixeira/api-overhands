@@ -1,27 +1,36 @@
-const jwt = require('jsonwebtoken')
-const authConfig = require('../config/auth')
+const jwt = require("jsonwebtoken");
+const authConfig = require("../config/auth");
+const User = require('../models/User');
 
-module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization
+module.exports = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
 
-    if (!authHeader)
-        return res.status(401).json({ error: 'Token is missing' })
+        if (!authHeader) {
+            return res.status(401).json({ error: "Token is missing" });
+        }
 
-    const parts = authHeader.split(' ')
+        const tokenParts = authHeader.split(" ");
 
-    if (!parts === 2)
-        return res.status(401).json({ error: 'Token error' })
+        if (tokenParts.length !== 2) {
+            return res.status(401).json({ error: "Token error" });
+        }
 
+        const [scheme, token] = tokenParts;
 
-    const [scheme, token] = parts
+        const decoded = jwt.verify(token, authConfig.secret);
 
+        const userId = decoded.id;
 
-    jwt.verify(token, authConfig.secret, (err, decoded) => {
-        if(err) return res.status(401).json({error: 'Invalid token'})
+        const user = await User.findByPk(userId);
 
-      //  req.userId = decoded.id
-     //   console.log('SEU ID É '+ req.userId)
-        return next()
-    })
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
 
-}
+        return await next();
+    }
+    catch (err) {
+        return res.status(401).json({ error: "Invalid token" });
+    }
+};
