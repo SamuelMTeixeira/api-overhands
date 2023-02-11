@@ -10,7 +10,7 @@ module.exports = {
             return await res.status(400).json({ error: 'Study track ID is missing' })
 
         const allCategories = await Category.findAll({
-            attributes: ['name', 'difficulty', 'difficultyOrder'],
+            attributes: ['id', 'name', 'difficulty', 'difficultyOrder'],
             where: { "StudyTracks_id": idStudyTrack },
             order: ['difficultyOrder']
         });
