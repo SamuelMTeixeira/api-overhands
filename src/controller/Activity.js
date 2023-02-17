@@ -15,7 +15,6 @@ module.exports = {
 
         // Query
         const activities = await Activities.findAll({
-            attributes: ['id', 'name', 'imageDescription', 'xp', 'type', 'correctImage'],
             where: { "Category_id": idCategory }
         })
 
