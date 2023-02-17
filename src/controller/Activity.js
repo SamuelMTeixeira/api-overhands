@@ -4,6 +4,14 @@ const Activities = require('../models/Activity')
 // MinIO
 const getPresignedUrl = require('../minio/getPresignedUrl')
 
+const { Configuration, OpenAIApi } = require("openai")
+
+require('dotenv').config()
+
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
 module.exports = {
     async index(req, res) {
 
@@ -17,6 +25,10 @@ module.exports = {
         const activities = await Activities.findAll({
             where: { "Category_id": idCategory }
         })
+
+        const openai = new OpenAIApi(configuration)
+
+        let result = []
 
         // * Take an image name and request an url for this image
         const promises = activities.map(async activity => {
@@ -35,11 +47,29 @@ module.exports = {
                     console.error(error);
                 }
             }
+
+            const completion = await openai.createCompletion({
+                model: 'text-davinci-003',
+                prompt: `Crie 3 alternativas fakes (apenas a palavra) para um quiz de conteúdo da Língua Brasileira de sinais (separadas por virgula e sem pontos ou espaços antes e depois da vírgula), na qual a palavra correta é ${activity.correctAnswer}`,
+                max_tokens: 1000
+            })
+
+            if (activity.type === 1) {
+                const words = completion.data.choices[0].text
+                let wordsArray = words.replace(/[\s.]+/g, "")
+                wordsArray = wordsArray.split(",")
+
+                result.push({ ...activity.toJSON(), wrongOptions: wordsArray })
+            }
+            else {
+                result.push({ ...activity.toJSON() })
+            }
+
         });
 
         await Promise.all(promises)
 
-        return res.json(activities)
+        return await res.json(result.sort())
     },
 
     async store(req, res) {
