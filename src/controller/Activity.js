@@ -4,6 +4,8 @@ const Activities = require('../models/Activity')
 // MinIO
 const getPresignedUrl = require('../minio/getPresignedUrl')
 
+const getImages = require('../minio/getImages')
+
 const { Configuration, OpenAIApi } = require("openai")
 
 require('dotenv').config()
@@ -26,8 +28,6 @@ module.exports = {
             where: { "Category_id": idCategory }
         })
 
-        const openai = new OpenAIApi(configuration)
-
         let result = []
 
         // * Take an image name and request an url for this image
@@ -48,13 +48,15 @@ module.exports = {
                 }
             }
 
-            const completion = await openai.createCompletion({
-                model: 'text-davinci-003',
-                prompt: `Crie 3 alternativas fakes (apenas a palavra) para um quiz de conteúdo da Língua Brasileira de sinais (separadas por virgula e sem pontos ou espaços antes e depois da vírgula), na qual a palavra correta é ${activity.correctAnswer}`,
-                max_tokens: 1000
-            })
-
             if (activity.type === 1) {
+                const openai = new OpenAIApi(configuration)
+
+                const completion = await openai.createCompletion({
+                    model: 'text-davinci-003',
+                    prompt: `Crie 3 alternativas fakes (apenas a palavra) para um quiz de conteúdo da Língua Brasileira de sinais (separadas por virgula e sem pontos ou espaços antes e depois da vírgula), na qual a palavra correta é ${activity.correctAnswer}`,
+                    max_tokens: 1000
+                })
+
                 const words = completion.data.choices[0].text
                 let wordsArray = words.replace(/[\s.]+/g, "")
                 wordsArray = wordsArray.split(",")
@@ -62,14 +64,20 @@ module.exports = {
                 result.push({ ...activity.toJSON(), wrongOptions: wordsArray })
             }
             else {
-                result.push({ ...activity.toJSON() })
-            }
+                const imgNames = await getImages('images-random')
 
-        });
+                const img1 = await getPresignedUrl('images-random', imgNames[0], 604800) // 604800 = Expires in 7 days
+                const img2 = await getPresignedUrl('images-random', imgNames[1], 604800) // 604800 = Expires in 7 days
+                const img3 = await getPresignedUrl('images-random', imgNames[2], 604800) // 604800 = Expires in 7 days
+
+                result.push({ ...activity.toJSON(), wrongOptions: [img1, img2, img3] })
+            }
+        })
+
 
         await Promise.all(promises)
 
-        return await res.json(result.sort())
+        return res.json(result.sort())
     },
 
     async store(req, res) {
