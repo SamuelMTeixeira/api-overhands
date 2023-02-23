@@ -93,7 +93,7 @@ const getActivityWithWrongOptions = async (activity) => {
 
         const completion = await openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `Escreva apenas nome de 3 sinais da Língua Brasileira de Sinais parecidos com o sinal: ${activity.correctAnswer}, lembrando que é para um quiz, 
+            prompt: `Escreva apenas o nome de 3 sinais da Língua Brasileira de Sinais que a configuração de mão se parece com o sinal: ${activity.correctAnswer},
             na qual não contenha espaços antes e depois da virgula. Sem mais detalhes`,
             max_tokens: 1000,
         });
@@ -103,8 +103,6 @@ const getActivityWithWrongOptions = async (activity) => {
         const wordsArray = words
             .replace(/[.\s:]+/g, "")
             .split(",")
-
-        console.log(wordsArray)
 
         result.wrongOptions = wordsArray;
     } else {
