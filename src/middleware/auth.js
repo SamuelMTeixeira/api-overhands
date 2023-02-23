@@ -25,12 +25,12 @@ module.exports = async (req, res, next) => {
         const user = await User.findByPk(userId);
 
         if (!user) {
-            return res.status(401).json({ error: 'Invalid token' });
+            return res.status(401).json({ error: 'User not found' });
         }
 
         return await next();
     }
     catch (err) {
-        return res.status(401).json({ error: "Invalid token" });
+        return res.status(401).json({ error: "Could not validate if this user is authenticated" });
     }
 };

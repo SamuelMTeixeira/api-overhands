@@ -25,7 +25,7 @@ module.exports = async (req, res, next) => {
         const user = await User.findByPk(userId);
 
         if (!user) {
-            return res.status(401).json({ error: 'Invalid token' });
+            return res.status(401).json({ error: 'User not found' });
         }
 
         if (!user.isAdmin) {
@@ -34,7 +34,7 @@ module.exports = async (req, res, next) => {
 
         return next();
     } catch (error) {
-        return res.status(401).json({ error: 'Invalid token' });
+        return res.status(401).json({ error: 'Could not validate if this user is admin' });
     }
 
 }
