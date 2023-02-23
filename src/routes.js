@@ -5,6 +5,7 @@ const StudyTracksController = require('./controller/StudyTrack')
 const AuthController = require('./controller/Auth')
 const CategoryController = require('./controller/Category')
 const ActivityController = require('./controller/Activity')
+const StatController = require('./controller/Stat')
 
 // Middlewares
 const authMiddleware = require('./middleware/auth')
@@ -27,8 +28,11 @@ routes.post('/study-tracks', adminMiddleware, StudyTracksController.store)
 routes.get('/categories', authMiddleware, CategoryController.index)
 routes.post('/categories', adminMiddleware, CategoryController.store)
 
-// Category tracks routes
+// Activity routes
 routes.get('/activities', authMiddleware, ActivityController.index)
 routes.post('/activities', [adminMiddleware, multer.single('file')], ActivityController.store)
+
+// Stat routes
+routes.post('/activities/report', authMiddleware, StatController.store)
 
 module.exports = routes
