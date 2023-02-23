@@ -19,65 +19,19 @@ module.exports = {
 
         const { idCategory } = req.query
 
-        // Validations
-        if (!idCategory)
-            return await res.status(400).json({ error: 'Missing activity ID' })
+        if (!idCategory) {
+            return res.status(400).json({ error: "Missing activity ID" })
+        }
 
-        // Query
         const activities = await Activities.findAll({
-            where: { "Category_id": idCategory }
+            where: { Category_id: idCategory },
         })
 
-        let result = []
+        const results = await Promise.all(
+            activities.map(getActivityWithWrongOptions)
+        )
 
-        // * Take an image name and request an url for this image
-        const promises = activities.map(async activity => {
-            if (activity.imageDescription) {
-                try {
-                    const presignedUrl = await getPresignedUrl('tcc', activity.imageDescription, 604800) // 604800 = Expires in 7 days
-                    activity.imageDescription = presignedUrl
-                } catch (error) {
-                    console.error(error);
-                }
-            } else if (activity.correctImage) {
-                try {
-                    const presignedUrl = await getPresignedUrl('tcc', activity.correctImage, 604800)
-                    activity.correctImage = presignedUrl
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-
-            if (activity.type === 1) {
-                const openai = new OpenAIApi(configuration)
-
-                const completion = await openai.createCompletion({
-                    model: 'text-davinci-003',
-                    prompt: `Crie 3 alternativas fakes (apenas a palavra) para um quiz de conteúdo da Língua Brasileira de sinais (separadas por virgula e sem pontos ou espaços antes e depois da vírgula), na qual a palavra correta é ${activity.correctAnswer}`,
-                    max_tokens: 1000
-                })
-
-                const words = completion.data.choices[0].text
-                let wordsArray = words.replace(/[\s.]+/g, "")
-                wordsArray = wordsArray.split(",")
-
-                result.push({ ...activity.toJSON(), wrongOptions: wordsArray })
-            }
-            else {
-                const imgNames = await getImages('images-random')
-
-                const img1 = await getPresignedUrl('images-random', imgNames[0], 604800) // 604800 = Expires in 7 days
-                const img2 = await getPresignedUrl('images-random', imgNames[1], 604800) // 604800 = Expires in 7 days
-                const img3 = await getPresignedUrl('images-random', imgNames[2], 604800) // 604800 = Expires in 7 days
-
-                result.push({ ...activity.toJSON(), wrongOptions: [img1, img2, img3] })
-            }
-        })
-
-
-        await Promise.all(promises)
-
-        return res.json(result.sort())
+        res.json(results.sort())
     },
 
     async store(req, res) {
@@ -106,7 +60,7 @@ module.exports = {
 
 }
 
-
+// * Quiz options
 const createQuizTypeImage = async (data, res) => {
 
     if (!data.correctAnswer)
@@ -122,4 +76,46 @@ const createQuizTypeText = async (data, res) => {
     const newActivityText = await Activities.create(data)
 
     return await res.json({ status: `Activity '${newActivityText.name}' was successfully created` })
+}
+
+// Configs options
+const getActivityWithWrongOptions = async (activity) => {
+    const result = { ...activity.toJSON() }
+
+    if (activity.imageDescription) {
+        result.imageDescription = await getPresignedUrl("tcc", activity.imageDescription, 604800)
+    } else if (activity.correctImage) {
+        result.correctImage = await getPresignedUrl("tcc", activity.correctImage, 604800)
+    }
+
+    if (activity.type === 1) {
+        const openai = new OpenAIApi(configuration)
+
+        const completion = await openai.createCompletion({
+            model: "text-davinci-003",
+            prompt: `Escreva apenas nome de 3 sinais da Língua Brasileira de Sinais parecidos com o sinal: ${activity.correctAnswer}, lembrando que é para um quiz, 
+            na qual não contenha espaços antes e depois da virgula. Sem mais detalhes`,
+            max_tokens: 1000,
+        });
+
+        const words = completion.data.choices[0].text
+
+        const wordsArray = words
+            .replace(/[.\s:]+/g, "")
+            .split(",")
+
+        console.log(wordsArray)
+
+        result.wrongOptions = wordsArray;
+    } else {
+        const imgNames = await getImages("images-random")
+        const presignedUrls = await Promise.all(
+            imgNames.map((imgName) =>
+                getPresignedUrl("images-random", imgName, 604800)
+            )
+        )
+        result.wrongOptions = [presignedUrls[0], presignedUrls[1], presignedUrls[2]]
+    }
+
+    return result;
 }
