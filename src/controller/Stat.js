@@ -7,17 +7,17 @@ module.exports = {
         const { reports } = req.body
 
         if (!reports) {
-            return await res.status(400).json({ error: 'Report is missing' })
+            return await res.status(403).json({ error: 'Report is missing' })
         }
 
         reports.forEach(async (report) => {
             const stat = await Stat.create(report)
 
             if(!stat) {
-                return await res.status(500).json({ error: 'Error to create report' })
+                return res.status(400).json({ error: 'Error to create report' })
             }
         })
 
-        return await res.json({ status: 'Report successfully delivered' })
+        return await res.json({ status: 'Reports successfully delivered' })
     }
 }
