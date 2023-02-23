@@ -4,7 +4,6 @@ class Stat extends Model {
     static init(sequelize) {
         super.init({
             isCorrect: DataTypes.BOOLEAN,
-            description: DataTypes.STRING
         }, {
             sequelize,
         })

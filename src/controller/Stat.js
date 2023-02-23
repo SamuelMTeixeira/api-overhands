@@ -13,7 +13,7 @@ module.exports = {
         reports.forEach(async (report) => {
             const stat = await Stat.create(report)
 
-            if(!stat) {
+            if (!stat) {
                 return res.status(400).json({ error: 'Error to create report' })
             }
         })
