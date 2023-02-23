@@ -4,13 +4,13 @@ const Stat = require('../models/Stat')
 module.exports = {
     async store(req, res) {
         // Receive all report activities
-        const { data } = req.body
+        const { reports } = req.body
 
-        if (!data) {
+        if (!reports) {
             return await res.status(400).json({ error: 'Report is missing' })
         }
 
-        data.forEach(async (report) => {
+        reports.forEach(async (report) => {
             const stat = await Stat.create(report)
 
             if(!stat) {
