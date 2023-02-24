@@ -34,34 +34,45 @@ module.exports = {
         res.json(results.sort())
     },
 
-    async store(req, res) {
-
-        const { name, type, xp, idCategory, correctAnswer, tip } = JSON.parse(req.body.informations)
+    async storeQuizTypeText(req, res) {
+        const { name, xp, idCategory, correctAnswer, tip } = JSON.parse(req.body.informations)
 
         // Take the image name uploaded
         const { objectName } = req.file
 
         // Validations
-        if (!idCategory || !type || !xp || !name)
+        if (!idCategory || !xp || !name || !tip)
             return await res.status(400).json({ error: 'Some important params is missing' })
 
-        if (![1, 2].includes(type))
-            return res.status(400).json({ error: 'Type invalid' })
+        return await createQuizTypeText({ name, type: 1, xp, correctAnswer, imageDescription: objectName, Category_id: idCategory, tip }, res)
+    },
 
+    async storeQuizTypeImage(req, res) {
 
-        // Create the quiz
-        switch (type) {
-            case 1:
-                return await createQuizTypeImage({ name, type, xp, correctAnswer, imageDescription: objectName, Category_id: idCategory, tip }, res)
-            case 2:
-                return await createQuizTypeText({ name, type, xp, correctImage: objectName, Category_id: idCategory, tip }, res)
-        }
+        // Take the image name uploaded
+        const { files, body } = req
+
+        const { name, xp, idCategory, tip } = JSON.parse(body.informations)
+
+        // Validations
+        if (!idCategory || !xp || !name || !tip)
+            return await res.status(400).json({ error: 'Some important params is missing' })
+
+        const wrongImages = files
+            .filter((file, index) => index > 0)
+            .map((file) => { return { name: file.objectName } })
+
+        return await createQuizTypeImage({ name, type: 2, xp, correctImage: files[0].objectName, Category_id: idCategory, tip, wrongImages }, res)
     }
 
 }
 
-// * Quiz options
-const createQuizTypeImage = async (data, res) => {
+
+// * SOME SYSTEM FUNCTIONS
+
+
+// Neste quiz, o usuário tem que escolher o texto correto
+const createQuizTypeText = async (data, res) => {
 
     if (!data.correctAnswer)
         return await res.status(400).json({ error: 'A correct answer is missing' })
@@ -71,20 +82,23 @@ const createQuizTypeImage = async (data, res) => {
     return await res.json({ status: `Activity '${newActivityText.name}' was successfully created` });
 }
 
-const createQuizTypeText = async (data, res) => {
+// Neste quiz, o usuário tem que escolher a imagem correta
+const createQuizTypeImage = async (data, res) => {
 
     const newActivityText = await Activities.create(data)
 
     return await res.json({ status: `Activity '${newActivityText.name}' was successfully created` })
 }
 
-// Configs options
+// * Configs options
 const getActivityWithWrongOptions = async (activity) => {
     const result = { ...activity.toJSON() }
 
     if (activity.imageDescription) {
         result.imageDescription = await getPresignedUrl("tcc", activity.imageDescription, 604800)
-    } else if (activity.correctImage) {
+    }
+
+    if (activity.correctImage) {
         result.correctImage = await getPresignedUrl("tcc", activity.correctImage, 604800)
     }
 
@@ -103,17 +117,26 @@ const getActivityWithWrongOptions = async (activity) => {
         const wordsArray = words
             .replace(/[.\s:]+/g, "")
             .split(",")
+            .map(word => word.toLowerCase())
 
-        result.wrongOptions = wordsArray;
+        result.options = [...wordsArray, result.correctAnswer.toLowerCase()]
     } else {
-        const imgNames = await getImages("images-random")
+
+        const imgNames = result.wrongImages
         const presignedUrls = await Promise.all(
             imgNames.map((imgName) =>
-                getPresignedUrl("images-random", imgName, 604800)
+                getPresignedUrl("tcc", imgName.name, 604800)
             )
         )
-        result.wrongOptions = [presignedUrls[0], presignedUrls[1], presignedUrls[2]]
+        result.options = [...presignedUrls, result.correctImage]
     }
 
-    return result;
+    // Algoritmo de Fisher-Yates
+    for (let i = result.options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result.options[i], result.options[j]] = [result.options[j], result.options[i]];
+    }
+
+    delete result.wrongImages
+    return result
 }

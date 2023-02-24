@@ -10,6 +10,7 @@ class Activity extends Model {
             tip: DataTypes.STRING,
             correctImage: DataTypes.STRING,
             correctAnswer: DataTypes.STRING,
+            wrongImages: DataTypes.JSON
         }, {
             sequelize,
         })

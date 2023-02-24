@@ -30,7 +30,9 @@ routes.post('/categories', adminMiddleware, CategoryController.store)
 
 // Activity routes
 routes.get('/activities', authMiddleware, ActivityController.index)
-routes.post('/activities', [adminMiddleware, multer.single('file')], ActivityController.store)
+routes.post('/activities/type-text', [adminMiddleware, multer.single('file')], ActivityController.storeQuizTypeText)
+routes.post('/activities/type-image', [adminMiddleware, multer.array('file', 4)], ActivityController.storeQuizTypeImage)
+//routes.post('/activities', [adminMiddleware, multer.single('file')], ActivityController.store)
 
 // Stat routes
 routes.post('/activities/report', authMiddleware, StatController.store)
