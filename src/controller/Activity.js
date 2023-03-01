@@ -4,8 +4,6 @@ const Activities = require('../models/Activity')
 // MinIO
 const getPresignedUrl = require('../minio/getPresignedUrl')
 
-const getImages = require('../minio/getImages')
-
 const { Configuration, OpenAIApi } = require("openai")
 
 require('dotenv').config()
@@ -31,7 +29,8 @@ module.exports = {
             activities.map(getActivityWithWrongOptions)
         )
 
-        res.json(results.sort())
+        results.sort(() => Math.random() - 0.5)
+        res.json(results)
     },
 
     async storeQuizTypeText(req, res) {
@@ -107,15 +106,16 @@ const getActivityWithWrongOptions = async (activity) => {
 
         const completion = await openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `Escreva apenas o nome de 3 sinais da Língua Brasileira de Sinais que a configuração de mão se parece com o sinal: ${activity.correctAnswer},
-            na qual não contenha espaços antes e depois da virgula. Sem mais detalhes`,
+            prompt: `Retorne o nome de 3 sinais da Língua Brasileira de Sinais na qual a configuração de mão se assemelhe com o sinal ${activity.correctAnswer} e não seja sinônimo,
+            me mande apenas as 3 palavras separadas por virgula, não use espaço antes e depois da palavra e mais nada. Considere que as opções são para um quiz, então use apenas sinais que possam confundir o aluno.
+            Exemplo de resposta:teste,teste,teste`,
             max_tokens: 1000,
         });
 
         const words = completion.data.choices[0].text
 
         const wordsArray = words
-            .replace(/[.\s:]+/g, "")
+            .replace(/^\s+|[.:]+/g, "")
             .split(",")
             .map(word => word.toLowerCase())
 
