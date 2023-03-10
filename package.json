@@ -6,9 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "docker-run": "cd docker && docker-compose --env-file=../.env up -d && cd ..",
-    "migrate": "sequelize db:migrate",
-    "add-migrate": "sequelize migration:create"
+    "docker:run": "cd docker && docker-compose --env-file=../.env up -d && cd ..",
+    "db:migrate": "sequelize db:migrate"
   },
   "keywords": [
     "Libras",
