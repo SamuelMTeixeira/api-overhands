@@ -6,6 +6,7 @@ const AuthController = require('./controller/Auth')
 const CategoryController = require('./controller/Category')
 const ActivityController = require('./controller/Activity')
 const StatController = require('./controller/Stat')
+const RankingController = require('./controller/Ranking')
 
 // Middlewares
 const authMiddleware = require('./middleware/auth')
@@ -36,5 +37,8 @@ routes.post('/activities/type-image', [adminMiddleware, multer.array('file', 4)]
 
 // Stat routes
 routes.post('/activities/report', authMiddleware, StatController.store)
+
+// Ranking routes
+routes.get('/ranking', authMiddleware, RankingController.index)
 
 module.exports = routes
