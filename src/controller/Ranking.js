@@ -29,7 +29,8 @@ module.exports = {
             group: ['user.id'],
             order: [
                 [sequelize.literal('xp'), 'DESC']
-            ]
+            ],
+            limit: 10
         })
 
 
